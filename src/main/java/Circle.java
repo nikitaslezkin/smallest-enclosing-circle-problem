@@ -1,6 +1,6 @@
 public class Circle {
 
-    public double x, y, r;
+    private double x, y, r;
     private long timeCreation, lifetime;
 
     public long getTimeCreation() {
@@ -22,6 +22,18 @@ public class Circle {
     public Circle() {
     }
 
+    public double x() {
+        return x;
+    }
+
+    public double y() {
+        return y;
+    }
+
+    public double r() {
+        return r;
+    }
+
     public Circle(double x, double y, double r) {
         this.x = x;
         this.y = y;
@@ -39,7 +51,7 @@ public class Circle {
         }
 
         Circle circle = (Circle) obj;
-        return Math.abs(x-circle.x)<eps && Math.abs(y - circle.y)<eps && Math.abs(r-circle.r)<eps;
+        return Math.abs(x - circle.x) < eps && Math.abs(y - circle.y) < eps && Math.abs(r - circle.r) < eps;
     }
 
     @Override

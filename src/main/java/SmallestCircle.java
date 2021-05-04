@@ -2,9 +2,10 @@ import java.util.*;
 
 public class SmallestCircle {
 
-    Set<Circle> whole;
-    Circle minimumEnclosingCircle;
-    Set<Circle> boundaryCircles;
+    private final Set<Circle> whole;
+    private Circle minimumEnclosingCircle;
+    private final Set<Circle> boundaryCircles;
+    private Circle obligatoryCircle;
 
     public SmallestCircle() {
         whole = new HashSet<>();
@@ -12,57 +13,66 @@ public class SmallestCircle {
         boundaryCircles = new HashSet<>();
     }
 
+    public Circle getMinimumEnclosingCircle() {
+        return minimumEnclosingCircle;
+    }
+
+    public Set<Circle> getBoundaryCircles() {
+        return boundaryCircles;
+    }
+
     private boolean isCircleIn(Circle c, Circle minc) {
-        return minc.r - dist(c.x,c.y,minc.x,minc.y)-c.r > 0;
+        return dist(c.x(), c.y(), minc.x(), minc.y()) + c.r() < minc.r();
     }
 
     private double dist(double x1, double y1, double x2, double y2) {
-        return Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+        return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
     }
 
-    private Circle getCircleByTwo (Circle a, Circle b) {
-        double r = dist(a.x,a.y, b.x, b.y);
-        double newx1 = a.x+a.r/r*(a.x-b.x);
-        double newy1 = a.y+a.r/r*(a.y-b.y);
+    private Circle getCircleByTwo(Circle a, Circle b) {
+        double r = dist(a.x(), a.y(), b.x(), b.y());
+        double newx1 = a.x() + a.r() / r * (a.x() - b.x());
+        double newy1 = a.y() + a.r() / r * (a.y() - b.y());
 
-        double newx2 = b.x-b.r/r*(a.x-b.x);
-        double newy2 = b.y-b.r/r*(a.y-b.y);
+        double newx2 = b.x() - b.r() / r * (a.x() - b.x());
+        double newy2 = b.y() - b.r() / r * (a.y() - b.y());
 
-        return new Circle((newx1+newx2)/2, (newy1+newy2)/2, dist(newx1,newy1,newx2,newy2)/2);
+        return new Circle((newx1 + newx2) / 2, (newy1 + newy2) / 2, dist(newx1, newy1, newx2, newy2) / 2);
     }
 
-    // Gradient descent
+    private Circle getCircleByThree(Circle z1, Circle z2, Circle z3) {
 
-    private double rho(double x, double y, Circle c) {
-        return dist(x,y,c.x,c.y) + c.r;
+        double c = 2 * (z2.x() - z1.x());
+        double d = 2 * (z2.y() - z1.y());
+        double e = 2 * (z1.r() - z2.r());
+        double f = z1.x() * z1.x() + z1.y() * z1.y() - z1.r() * z1.r() - z2.x() * z2.x() - z2.y() * z2.y() + z2.r() * z2.r();
+
+        double g = 2 * (z3.x() - z1.x());
+        double h = 2 * (z3.y() - z1.y());
+        double i = 2 * (z1.r() - z3.r());
+        double j = z1.x() * z1.x() + z1.y() * z1.y() - z1.r() * z1.r() - z3.x() * z3.x() - z3.y() * z3.y() + z3.r() * z3.r();
+
+        double m = (d * j - f * h) / (c * h - d * g);
+        double n = (d * i - e * h) / (c * h - d * g);
+
+        double p = (g * f - j * c) / (c * h - d * g);
+        double q = (g * e - i * c) / (c * h - d * g);
+
+        double a = m - z1.x();
+        double b = p - z1.y();
+
+        double aa = n * n + q * q - 1;
+        double bb = 2 * (a * n + b * q + z1.r());
+        double cc = a * a + b * b - z1.r() * z1.r();
+
+        double disc = bb * bb - 4 * aa * cc;
+        double rs = Math.max((-bb - Math.sqrt(disc)) / (2 * aa), (-bb + Math.sqrt(disc)) / (2 * aa));
+
+        double xs = m + n * rs;
+        double ys = p + q * rs;
+
+        return new Circle(xs, ys, rs);
     }
-
-    private double F(double x, double y, Circle a, Circle b, Circle c) {
-        return (rho(x,y,a)-rho(x,y,b)) * (rho(x,y,a)-rho(x,y,b)) +
-                (rho(x,y,a)-rho(x,y,c)) * (rho(x,y,a)-rho(x,y,c)) +
-                (rho(x,y,b)-rho(x,y,c)) * (rho(x,y,b)-rho(x,y,c));
-    }
-
-    private double sign(double x) {
-        return x > 0 ? 1: -1;
-    }
-
-    private Circle getCircleByThree (Circle a, Circle b, Circle c) {
-        Circle guess = new Circle((a.x+b.x+c.x)/3, (a.y+b.y+c.y)/3, 0);
-        double h = 0.5;
-        int n = 1;
-        while (F(guess.x, guess.y,a,b,c) > 0.1) {
-            double dx = (F(guess.x - h, guess.y, a, b, c) - F(guess.x + h, guess.y, a, b, c)) / (2 * h);
-            double dy = (F(guess.x, guess.y - h, a, b, c) - F(guess.x, guess.y + h, a, b, c)) / (2 * h);
-            guess.x += sign(dx)/Math.sqrt(n);
-            guess.y += sign(dy)/Math.sqrt(n);
-            n++;
-        }
-        guess.r = dist(guess.x,guess.y,a.x, a.y) + a.r;
-        return guess;
-    }
-
-    // End Gradient descent
 
     private void setBoundaryCircles(Set<Circle> circles) {
         boundaryCircles.clear();
@@ -71,7 +81,7 @@ public class SmallestCircle {
 
     private Circle trivialCase(Set<Circle> s) {
         if (s.isEmpty()) {
-            Circle buf = new Circle(0,0,0);
+            Circle buf = new Circle(0, 0, 0);
             setBoundaryCircles(new HashSet<>(Collections.singletonList(buf)));
             return buf;
         }
@@ -91,10 +101,13 @@ public class SmallestCircle {
         for (Circle circle : buf) {
             s.remove(circle);
             var it = s.iterator();
-            Circle c = getCircleByTwo(it.next(), it.next());
-            if (isCircleIn(circle, c)) {
-                setBoundaryCircles(s);
-                return c;
+            Circle a = it.next(), b = it.next();
+            if (obligatoryCircle == null || (obligatoryCircle.equals(a) || obligatoryCircle.equals(b))) {
+                Circle c = getCircleByTwo(a, b);
+                if (isCircleIn(circle, c)) {
+                    setBoundaryCircles(s);
+                    return c;
+                }
             }
             s.add(circle);
         }
@@ -130,6 +143,7 @@ public class SmallestCircle {
             whole.add(c);
             return;
         }
+        obligatoryCircle = c;
         minimumEnclosingCircle = Welzl(whole, new HashSet<>(Collections.singletonList(c)));
         whole.add(c);
     }
@@ -139,6 +153,7 @@ public class SmallestCircle {
         if (!boundaryCircles.contains(c)) {
             return;
         }
+        obligatoryCircle = null;
         minimumEnclosingCircle = Welzl(whole, new HashSet<>());
     }
 }

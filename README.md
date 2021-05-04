@@ -1,1 +1,4 @@
-# smallest-enclosing-circle-problem
+# Smallest Enclosing Circle Problem
+This project presents an implementation of the algorithm for finding the smallest enclosing circle and the UI for it. The project is a graphical application that illustrates finding the smallest enclosing circle.
+
+Circles with different coordinates, radii, and circle lifetime are randomly generated on a two-dimensional plane. The distribution law can be set manually before starting the application. The task of the application is to maintain the smallest enclosing circle at all times. For this, Welzl's algorithm was chosen, as well as an explicit algebraic formula for parsing the trivial case: smallest enclosing circle for three circles.

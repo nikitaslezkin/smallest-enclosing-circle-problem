@@ -8,21 +8,20 @@ public class GraphicsPanel extends JPanel {
 
     final int frameSizeX = 1930;
     final int frameSizeY = 1024;
-    final int circleLeftBoundX = 300;
-    final int circleRightBoundX = 1600;
+    final int circleLeftBoundX = 500;
+    final int circleRightBoundX = 1400;
     final int circleUpBoundY = 200;
     final int circleDownBoundY = 800;
     final int circleRadiusBoundFrom = 20;
     final int circleRadiusBoundTo = 70;
     final int circleLifetimeBoundFrom = 500;
-    final int circleLifetimeBoundTo = 5500;
+    final int circleLifetimeBoundTo = 550;
     final RandomUtils circleX = new RandomUtils(RandomUtils.Distribution.Uniform, circleLeftBoundX, circleRightBoundX);
     final RandomUtils circleY = new RandomUtils(RandomUtils.Distribution.Uniform, circleUpBoundY, circleDownBoundY);
-    //final RandomUtils circleRadius = new RandomUtils(RandomUtils.Distribution.Uniform, circleRadiusBoundFrom, circleRadiusBoundTo);
-    final RandomUtils circleRadius = new RandomUtils(RandomUtils.Distribution.Normal, circleRadiusBoundFrom + (circleRadiusBoundTo-circleRadiusBoundFrom)/2.0, 40);
+    final RandomUtils circleRadius = new RandomUtils(RandomUtils.Distribution.Uniform, circleRadiusBoundFrom, circleRadiusBoundTo);
+    //final RandomUtils circleRadius = new RandomUtils(RandomUtils.Distribution.Normal, circleRadiusBoundFrom + (circleRadiusBoundTo-circleRadiusBoundFrom)/2.0, 40);
     final RandomUtils circleLifetime = new RandomUtils(RandomUtils.Distribution.Uniform, circleLifetimeBoundFrom, circleLifetimeBoundTo);
-    final RandomUtils appearance = new RandomUtils(RandomUtils.Distribution.Uniform, 1, 300);
-
+    final RandomUtils appearance = new RandomUtils(RandomUtils.Distribution.Uniform, 1, 80);
 
 
     private final Set<Circle> circles;
@@ -39,9 +38,9 @@ public class GraphicsPanel extends JPanel {
             g2.setColor(Color.RED);
             g2.setStroke(new BasicStroke(3));
         }
-        g2.drawOval((int)(c.x-c.r), (int)(c.y-c.r), (int)(2*c.r), (int)(2*c.r));
+        g2.drawOval((int) (c.x() - c.r()), (int) (c.y() - c.r()), (int) (2 * c.r()), (int) (2 * c.r()));
         if (isFill) {
-            Ellipse2D.Double circle = new Ellipse2D.Double((int) (c.x - c.r), (int) (c.y - c.r), (int) (2 * c.r), (int) (2 * c.r));
+            Ellipse2D.Double circle = new Ellipse2D.Double((int) (c.x() - c.r()), (int) (c.y() - c.r()), (int) (2 * c.r()), (int) (2 * c.r()));
             g2.fill(circle);
         }
         if (isRed) {
@@ -51,7 +50,7 @@ public class GraphicsPanel extends JPanel {
 
     public void paintComponent(Graphics g) {
         g2 = (Graphics2D) g;
-        g2.clearRect(0,0,frameSizeX, frameSizeY);
+        g2.clearRect(0, 0, frameSizeX, frameSizeY);
         Set<Circle> deleted = new HashSet<>();
 
         //Delete old circles and draw remaining
@@ -70,12 +69,12 @@ public class GraphicsPanel extends JPanel {
         }
 
         //Draw boundary circles
-        for (Circle circle : smallestCircle.boundaryCircles) {
+        for (Circle circle : smallestCircle.getBoundaryCircles()) {
             drawCircle(circle, true, false);
         }
 
         //Draw minimum enclosing circle
-        drawCircle(smallestCircle.minimumEnclosingCircle, false, true);
+        drawCircle(smallestCircle.getMinimumEnclosingCircle(), false, true);
 
         //Probability of appearance and create new circle
         if (appearance.getRandom() == 1) {
