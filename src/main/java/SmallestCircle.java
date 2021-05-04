@@ -2,13 +2,13 @@ import java.util.*;
 
 public class SmallestCircle {
 
-    private final Set<Circle> whole;
+    private final Set<Circle> circles;
     private Circle minimumEnclosingCircle;
     private final Set<Circle> boundaryCircles;
-    private Circle obligatoryCircle;
+    private Circle mandatoryCircle;
 
     public SmallestCircle() {
-        whole = new HashSet<>();
+        circles = new HashSet<>();
         minimumEnclosingCircle = new Circle();
         boundaryCircles = new HashSet<>();
     }
@@ -19,6 +19,10 @@ public class SmallestCircle {
 
     public Set<Circle> getBoundaryCircles() {
         return boundaryCircles;
+    }
+
+    public Set<Circle> getCircles() {
+        return circles;
     }
 
     private boolean isCircleIn(Circle c, Circle minc) {
@@ -99,15 +103,15 @@ public class SmallestCircle {
         }
 
         for (Circle circle : buf) {
+            if (circle.equals(mandatoryCircle))
+                continue;
             s.remove(circle);
             var it = s.iterator();
-            Circle a = it.next(), b = it.next();
-            if (obligatoryCircle == null || (obligatoryCircle.equals(a) || obligatoryCircle.equals(b))) {
-                Circle c = getCircleByTwo(a, b);
-                if (isCircleIn(circle, c)) {
-                    setBoundaryCircles(s);
-                    return c;
-                }
+            Circle c = getCircleByTwo(it.next(), it.next());
+            if (isCircleIn(circle, c)) {
+                setBoundaryCircles(s);
+                s.add(circle);
+                return c;
             }
             s.add(circle);
         }
@@ -140,20 +144,20 @@ public class SmallestCircle {
 
     public void addCircle(Circle c) {
         if (isCircleIn(c, minimumEnclosingCircle)) {
-            whole.add(c);
+            circles.add(c);
             return;
         }
-        obligatoryCircle = c;
-        minimumEnclosingCircle = Welzl(whole, new HashSet<>(Collections.singletonList(c)));
-        whole.add(c);
+        mandatoryCircle = c;
+        minimumEnclosingCircle = Welzl(circles, new HashSet<>(Collections.singletonList(c)));
+        circles.add(c);
     }
 
     public void removeCircle(Circle c) {
-        whole.remove(c);
+        circles.remove(c);
         if (!boundaryCircles.contains(c)) {
             return;
         }
-        obligatoryCircle = null;
-        minimumEnclosingCircle = Welzl(whole, new HashSet<>());
+        mandatoryCircle = null;
+        minimumEnclosingCircle = Welzl(circles, new HashSet<>());
     }
 }

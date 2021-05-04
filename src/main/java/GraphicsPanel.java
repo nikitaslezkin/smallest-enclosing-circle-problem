@@ -12,24 +12,21 @@ public class GraphicsPanel extends JPanel {
     final int circleRightBoundX = 1400;
     final int circleUpBoundY = 200;
     final int circleDownBoundY = 800;
-    final int circleRadiusBoundFrom = 20;
-    final int circleRadiusBoundTo = 70;
-    final int circleLifetimeBoundFrom = 500;
-    final int circleLifetimeBoundTo = 550;
+    final int circleRadiusBoundFrom = 55;
+    final int circleRadiusBoundTo = 60;
+    final int circleLifetimeBoundFrom = 5000;
+    final int circleLifetimeBoundTo = 5000;
     final RandomUtils circleX = new RandomUtils(RandomUtils.Distribution.Uniform, circleLeftBoundX, circleRightBoundX);
     final RandomUtils circleY = new RandomUtils(RandomUtils.Distribution.Uniform, circleUpBoundY, circleDownBoundY);
-    final RandomUtils circleRadius = new RandomUtils(RandomUtils.Distribution.Uniform, circleRadiusBoundFrom, circleRadiusBoundTo);
-    //final RandomUtils circleRadius = new RandomUtils(RandomUtils.Distribution.Normal, circleRadiusBoundFrom + (circleRadiusBoundTo-circleRadiusBoundFrom)/2.0, 40);
+    //final RandomUtils circleRadius = new RandomUtils(RandomUtils.Distribution.Uniform, circleRadiusBoundFrom, circleRadiusBoundTo);
+    final RandomUtils circleRadius = new RandomUtils(RandomUtils.Distribution.Normal, circleRadiusBoundFrom + (circleRadiusBoundTo-circleRadiusBoundFrom)/2.0, 10);
     final RandomUtils circleLifetime = new RandomUtils(RandomUtils.Distribution.Uniform, circleLifetimeBoundFrom, circleLifetimeBoundTo);
-    final RandomUtils appearance = new RandomUtils(RandomUtils.Distribution.Uniform, 1, 80);
+    final RandomUtils appearance = new RandomUtils(RandomUtils.Distribution.Uniform, 1, 300);
 
-
-    private final Set<Circle> circles;
     SmallestCircle smallestCircle;
     Graphics2D g2;
 
     public GraphicsPanel() {
-        circles = new HashSet<>();
         smallestCircle = new SmallestCircle();
     }
 
@@ -54,7 +51,7 @@ public class GraphicsPanel extends JPanel {
         Set<Circle> deleted = new HashSet<>();
 
         //Delete old circles and draw remaining
-        for (Circle circle : circles) {
+        for (Circle circle : smallestCircle.getCircles()) {
             if ((circle.getTimeCreation() + circle.getLifetime()) < System.currentTimeMillis()) {
                 deleted.add(circle);
             } else {
@@ -64,7 +61,6 @@ public class GraphicsPanel extends JPanel {
 
         //Remove old circles
         for (Circle circle : deleted) {
-            circles.remove(circle);
             smallestCircle.removeCircle(circle);
         }
 
@@ -81,7 +77,6 @@ public class GraphicsPanel extends JPanel {
             Circle newCircle = new Circle(circleX.getRandom(), circleY.getRandom(), circleRadius.getRandom());
             newCircle.setTimeCreation(System.currentTimeMillis());
             newCircle.setLifetime(circleLifetime.getRandom());
-            circles.add(newCircle);
             smallestCircle.addCircle(newCircle);
         }
 
